@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weekly Habit Tracker</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #c7d7c0;
+    color: #1f3d2b;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .tracker {
+    max-width: 700px;
+    margin: auto;
+  }
+
+  .days-labels {
+    display: grid;
+    grid-template-columns: 180px repeat(7, 1fr);
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .habit {
+    display: grid;
+    grid-template-columns: 180px repeat(7, 1fr);
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .habit-title {
+    padding-right: 10px;
+    font-weight: bold;
+    cursor: text;
+  }
+
+  .habit-title[contenteditable]:focus {
+    outline: 2px dashed #2f6b4f;
+    background-color: #e4efe0;
+  }
+
+  input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+    justify-self: center;
+  }
+
+  .progress-container {
+    margin-top: 30px;
+  }
+
+  .progress-bar-bg {
+    width: 100%;
+    height: 22px;
+    background-color: #e4efe0;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #2f6b4f;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    text-align: center;
+    margin-top: 8px;
+    font-weight: bold;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🌱 Weekly Habit Tracker</h1>
+
+<div class="tracker">
+
+  <!-- Day Labels -->
+  <div class="days-labels">
+    <div></div>
+    <div>Mon</div>
+    <div>Tue</div>
+    <div>Wed</div>
+    <div>Thu</div>
+    <div>Fri</div>
+    <div>Sat</div>
+    <div>Sun</div>
+  </div>
+
+  <!-- Habits -->
+  <div class="habit">
+    <div class="habit-title" contenteditable="true">10,000 Steps</div>
+  </div>
+
+  <div class="habit">
+    <div class="habit-title" contenteditable="true">2 Hours Studying</div>
+  </div>
+
+  <div class="habit">
+    <div class="habit-title" contenteditable="true">Exercise</div>
+  </div>
+
+  <div class="habit">
+    <div class="habit-title" contenteditable="true">Read for 30 mins</div>
+  </div>
+
+  <div class="habit">
+    <div class="habit-title" contenteditable="true">Healthy Eating</div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar-bg">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0%</div>
+  </div>
+
+</div>
+
+<script>
+  const habits = document.querySelectorAll(".habit");
+  const progressBar = document.getElementById("progressBar");
+  const progressText = document.getElementById("progressText");
+
+  const DAYS = 7;
+
+  function getWeekNumber() {
+    const date = new Date();
+    const oneJan = new Date(date.getFullYear(), 0, 1);
+    return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+  }
+
+  const currentWeek = getWeekNumber();
+  const savedWeek = localStorage.getItem("habitWeek");
+
+  if (savedWeek != currentWeek) {
+    localStorage.clear();
+    localStorage.setItem("habitWeek", currentWeek);
+  }
+
+  habits.forEach((habit, hIndex) => {
+    for (let i = 0; i < DAYS; i++) {
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+
+      const key = `habit-${hIndex}-day-${i}`;
+      checkbox.checked = localStorage.getItem(key) === "true";
+
+      checkbox.addEventListener("change", () => {
+        localStorage.setItem(key, checkbox.checked);
+        updateProgress();
+      });
+
+      habit.appendChild(checkbox);
+    }
+  });
+
+  function updateProgress() {
+    const total = habits.length * DAYS;
+    const checked = document.querySelectorAll("input[type='checkbox']:checked").length;
+    const percent = Math.round((checked / total) * 100);
+    progressBar.style.width = percent + "%";
+    progressText.textContent = percent + "%";
+  }
+
+  updateProgress();
+</script>
+
+
+</body>
+</html>
